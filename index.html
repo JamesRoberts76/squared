@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Squared Guide | Skeletal Geometry &amp; Frame Leveling</title>
+    <style>
+        :root {
+            --bg-color: #0c0c0e;
+            --surface-color: #141417;
+            --surface-border: #232328;
+            --text-primary: #f4f4f6;
+            --text-secondary: #9a9a9f;
+            --accent-color: #d4af37;
+            --accent-hover: #e5c158;
+            --danger-color: #8b3a3a;
+            --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --max-width: 720px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            line-height: 1.6;
+            padding: clamp(1rem, 3vw, 2rem) 1rem;
+            display: flex;
+            justify-content: center;
+            position: relative;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 450px;
+            height: 450px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='none' stroke='%23d4af37' stroke-width='1.2' stroke-linecap='round'%3E%3Crect x='25' y='25' width='50' height='50'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: contain;
+            opacity: 0.06;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: var(--max-width);
+            position: relative;
+            z-index: 1;
+        }
+
+        header {
+            margin-bottom: 3rem;
+            border-bottom: 1px solid var(--surface-border);
+            padding-bottom: 1.5rem;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 1rem;
+        }
+
+        .logo {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 1.25rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-tabs a {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s ease;
+            cursor: pointer;
+        }
+
+        .nav-tabs a:hover {
+            color: var(--accent-color);
+        }
+
+        section {
+            margin-bottom: 3.5rem;
+        }
+
+        h1 {
+            font-size: clamp(1.8rem, 4vw, 2.25rem);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        h2 {
+            font-size: clamp(1.2rem, 3vw, 1.35rem);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            letter-spacing: -0.01em;
+            color: var(--text-primary);
+            border-left: 3px solid var(--accent-color);
+            padding-left: 0.75rem;
+        }
+
+        p {
+            color: var(--text-secondary);
+            margin-bottom: 1.25rem;
+            font-size: clamp(0.98rem, 2vw, 1.05rem);
+        }
+
+        .lead {
+            font-size: clamp(1.05rem, 2.5vw, 1.15rem);
+            color: var(--text-primary);
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background-color: var(--surface-color);
+            border: 1px solid var(--surface-border);
+            border-radius: 6px;
+            padding: 1.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        ul {
+            list-style: none;
+            margin-bottom: 1.25rem;
+        }
+
+        ul li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        ul li::before {
+            content: "—";
+            position: absolute;
+            left: 0;
+            color: var(--accent-color);
+        }
+
+        ul li strong {
+            color: var(--text-primary);
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        @media (min-width: 600px) {
+            .comparison-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .comparison-card {
+            background-color: var(--surface-color);
+            border: 1px solid var(--surface-border);
+            border-radius: 6px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .fan-canvas {
+            width: 100%;
+            height: 220px;
+            background-color: #121216;
+            border: 1px solid var(--surface-border);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.25rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .fan-canvas svg {
+            max-height: 190px;
+            width: auto;
+        }
+
+        .comparison-card h3 {
+            font-size: 1.15rem;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .comparison-card p {
+            font-size: 0.9rem;
+            margin-bottom: 0;
+        }
+
+        .visual-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        @media (min-width: 600px) {
+            .visual-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .visual-card {
+            background-color: var(--surface-color);
+            border: 1px solid var(--surface-border);
+            border-radius: 6px;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .visual-card h3 {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            border-bottom: 1px solid var(--surface-border);
+            padding-bottom: 0.4rem;
+        }
+
+        .visual-card p {
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .cta-box {
+            background-color: var(--surface-color);
+            border: 1px solid var(--accent-color);
+            border-radius: 6px;
+            padding: 2rem;
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        .cta-box h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            font-weight: 600;
+            padding: 0.75rem 2rem;
+            border-radius: 4px;
+            text-decoration: none;
+            margin-top: 1rem;
+            transition: background-color 0.2s ease;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn:hover {
+            background-color: var(--accent-hover);
+        }
+
+        /* Immersive Full-Screen Portal Interface */
+        .immersive-portal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: var(--bg-color);
+            z-index: 2000;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .immersive-portal.active {
+            display: flex;
+        }
+
+        .portal-header {
+            width: 100%;
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 2rem 1rem 1.5rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--surface-border);
+        }
+
+        .portal-title {
+            font-size: 0.9rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        .portal-exit {
+            background: none;
+            border: 1px solid var(--surface-border);
+            color: var(--text-secondary);
+            padding: 0.4rem 1rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .portal-exit:hover {
+            border-color: var(--accent-color);
+            color: var(--text-primary);
+        }
+
+        .portal-body {
+            width: 100%;
+            max-width: var(--max-width);
+            margin: 0 auto;
+            flex: 1;
+            padding: 2rem 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .portal-feed {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .portal-message {
+            background-color: var(--surface-color);
+            border: 1px solid var(--surface-border);
+            border-radius: 6px;
+            padding: 1.5rem;
+            font-size: 1.05rem;
+            line-height: 1.6;
+        }
+
+        .portal-message.system {
+            border-left: 3px solid var(--accent-color);
+            color: var(--text-primary);
+        }
+
+        .portal-message.user {
+            background-color: #121216;
+            border-color: var(--accent-color);
+            color: var(--text-primary);
+            align-self: flex-end;
+            width: 85%;
+        }
+
+        .portal-input-container {
+            position: sticky;
+            bottom: 0;
+            background-color: var(--bg-color);
+            padding: 1rem 0 2rem 0;
+            border-top: 1px solid var(--surface-border);
+            display: flex;
+            gap: 0.75rem;
+            max-width: var(--max-width);
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .portal-textarea {
+            flex: 1;
+            background-color: var(--surface-color);
+            border: 1px solid var(--surface-border);
+            border-radius: 6px;
+            padding: 0.85rem 1rem;
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-family: var(--font-main);
+            resize: none;
+            height: 54px;
+            outline: none;
+        }
+
+        .portal-textarea:focus {
+            border-color: var(--accent-color);
+        }
+
+        .portal-submit {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            font-weight: 600;
+            border: none;
+            border-radius: 6px;
+            padding: 0 1.75rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .portal-submit:hover {
+            background-color: var(--accent-hover);
+        }
+
+        footer {
+            border-top: 1px solid var(--surface-border);
+            padding-top: 2rem;
+            margin-top: 4rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent-color);
+        }
+
+        .pricing-tag {
+            font-family: monospace;
+            color: var(--accent-color);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="header-top">
+            <a href="#" class="logo">Squared Guide</a>
+            <nav class="nav-tabs">
+                <a href="#geometry">Geometry</a>
+                <a href="#pelvis">Pelvic Grid</a>
+                <a href="#origin">The Origin</a>
+                <a href="#protocol">Protocol</a>
+                <a href="#pricing">Pricing</a>
+                <a href="#legal">Legal &amp; Terms</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- Opening Section -->
+        <section>
+            <h1>Skeletal Geometry &amp; Frame Leveling</h1>
+            <p class="lead">Chronic asymmetry stems from rotational distortion—where the skeletal frame drifts out of true alignment, locking the torso into persistent lateral drag.</p>
+            
+            <div class="card" style="border-left: 3px solid var(--accent-color);">
+                <h3 style="font-size: 1.1rem; color: var(--text-primary); margin-bottom: 0.5rem;">What is Frame Squaring?</h3>
+                <p style="font-size: 0.95rem; margin-bottom: 0;">The human chassis is engineered around orthogonal planes. When daily habits introduce rotational bias, the pelvis lists and the shoulder girdle shears off-axis, forcing muscles to work overtime just to keep you upright.</p>
+            </div>
+
+            <p>Standard modalities treat posture as a conscious effort of holding yourself straight. True alignment requires dismantling rotational bias at the pelvic foundation and re-establishing orthogonal balance across the frame.</p>
+        </section>
+
+        <!-- Geometry Architecture -->
+        <section>
+            <h2>The Mechanics of Alignment: Twisted vs. Squared</h2>
+            <p>When the frame is locked in rotational asymmetry, movement generates uneven wear and chronic friction. Restoring the square transforms load distribution across the entire structure.</p>
+            
+            <div class="comparison-grid">
+                <div class="comparison-card" style="border-color: var(--danger-color);">
+                    <div class="fan-canvas">
+                        <svg viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+                            <polygon points="50,30 110,40 100,130 40,120" fill="none" stroke="#8b3a3a" stroke-width="2"/>
+                            <line x1="50" y1="30" x2="100" y2="130" stroke="#8b3a3a" stroke-width="1.5" stroke-dasharray="4"/>
+                            <text x="80" y="148" fill="#8b3a3a" font-size="9" font-family="monospace" text-anchor="middle">ROTATIONAL BIAS</text>
+                        </svg>
+                    </div>
+                    <span style="font-size: 0.75rem; color: var(--danger-color); font-family: monospace; display: block; margin-bottom: 0.35rem;">SKEWED STATE</span>
+                    <h3>Rotational Twist</h3>
+                    <p>Pelvic tilt and shoulder counter-rotation. Uneven load transfer resulting in chronic structural drag.</p>
+                </div>
+
+                <div class="comparison-card" style="border-color: var(--accent-color);">
+                    <div class="fan-canvas">
+                        <svg viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="40" y="30" width="80" height="100" rx="4" fill="none" stroke="#d4af37" stroke-width="2"/>
+                            <line x1="40" y1="80" x2="120" y2="80" stroke="#d4af37" stroke-width="1.5"/>
+                            <text x="80" y="148" fill="#d4af37" font-size="9" font-family="monospace" text-anchor="middle">ORTHOGONAL SQUARED</text>
+                        </svg>
+                    </div>
+                    <span style="font-size: 0.75rem; color: var(--accent-color); font-family: monospace; display: block; margin-bottom: 0.35rem;">SQUARED STATE</span>
+                    <h3>Level Foundation</h3>
+                    <p>True orthogonal balance. Effortless vertical load-bearing and neutralized rotational shear.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Origin Section -->
+        <section id="origin">
+            <h2>The Origin: Experience Over Academic Theory</h2>
+            <div class="card">
+                <p>Decades spent navigating structural specialists and physical therapies revealed a core blind spot: medicine attempts to fix posture through conscious muscle bracing rather than correcting the underlying skeletal geometry.</p>
+                <p>This protocol stems from rigorous personal mapping—identifying how pelvic level and rotational counter-forces dictate structural ease without depending on external clinical intervention.</p>
+                <p style="margin-bottom: 0;">Sovereignty requires mastering your own skeletal geometry.</p>
+            </div>
+        </section>
+
+        <!-- Protocol Section -->
+        <section id="protocol">
+            <h2>The Core Leveling Protocols &amp; Pelvic Grid</h2>
+            <p>Asymmetry compounds when the pelvic foundation shifts off level. Re-establishing the square requires direct engagement with the deep stabilizing grid.</p>
+            
+            <div class="card">
+                <ul>
+                    <li><strong>1. Pelvic Horizon Mapping:</strong> Identify and correct subtle lateral pelvic lists that throw the entire spinal column into compensatory curves.</li>
+                    <li><strong>2. Rotational Unwinding:</strong> Systematically neutralize cross-body twists by retraining the deep hip and torso stabilizers to accept balanced axial loads.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Pricing & CTA -->
+        <section id="pricing">
+            <h2>The Sovereign Network Hub &amp; Pricing Policy</h2>
+            <p>Engineered with dry British precision. When you are ready to square your structural frame and eliminate rotational drag, engage the study portal.</p>
+            
+            <div class="cta-box">
+                <h3>Unlock Skeletal Geometry</h3>
+                <p>Direct, uncompromised access to framing frameworks and structural leveling protocols.</p>
+                <div class="pricing-tag">€60 / 365 Days — Zero Auto-Renewals</div>
+                <p style="font-size: 0.85rem; margin-top: 0.75rem; color: var(--text-secondary);">Pricing Policy: One flat annual fee. No hidden subscription traps, no surprise recurring billing, and zero automatic renewals.</p>
+                <br>
+                <button class="btn" id="openPortalBtn" type="button">Engage the Study Portal</button>
+            </div>
+        </section>
+
+        <section id="legal" style="margin-top: 4rem; border-top: 1px solid var(--surface-border); padding-top: 2rem;">
+            <h2>Terms, Conditions &amp; Policies</h2>
+            <h3 style="font-size: 1.1rem; color: var(--text-primary); margin-top: 1.5rem; margin-bottom: 0.5rem;">Terms &amp; Conditions</h3>
+            <p style="font-size: 0.95rem;">By accessing squared.guide, you operate under your own sovereign authority. Protocols are educational frameworks for self-treatment and do not constitute formal medical diagnosis.</p>
+            <h3 style="font-size: 1.1rem; color: var(--text-primary); margin-top: 1.5rem; margin-bottom: 0.5rem;">Privacy Policy</h3>
+            <p style="font-size: 0.95rem;">Absolute data privacy is foundational. Zero tracking pixels, no intrusive third-party cookies, and no data harvesting.</p>
+            <h3 style="font-size: 1.1rem; color: var(--text-primary); margin-top: 1.5rem; margin-bottom: 0.5rem;">Refund Policy</h3>
+            <p style="font-size: 0.95rem;">Annual access fees are final upon activation due to the immediate digital delivery of unspooling frameworks.</p>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div>Part of the Sovereign Network Ecosystem &bull; Built by James</div>
+            <div class="footer-links">
+                <a href="#geometry">Geometry</a>
+                <a href="#pelvis">Pelvic Grid</a>
+                <a href="#origin">The Origin</a>
+                <a href="#pricing">Pricing Policy</a>
+                <a href="#legal">Privacy</a>
+                <a href="#legal">Terms</a>
+                <a href="#legal">Refunds</a>
+            </div>
+        </div>
+        <div style="font-size: 0.8rem; color: var(--text-secondary);">Minimalist Architecture &bull; No Tracking Pixels &bull; Absolute Sovereignty</div>
+    </footer>
+</div>
+
+<!-- Immersive Full-Screen Practice Portal -->
+<div class="immersive-portal" id="immersivePortal">
+    <div class="portal-header">
+        <div class="portal-title">Sovereign Network &bull; Architectural Study</div>
+        <button class="portal-exit" id="closePortalBtn" type="button">Return to Guide</button>
+    </div>
+    <div class="portal-body">
+        <div class="portal-feed" id="portalFeed">
+            <div class="portal-message system">
+                <strong>The Architect:</strong> Sovereign session initialized. Context is maintained across the network matrix. State your skeletal geometry or frame-leveling query.
+            </div>
+        </div>
+    </div>
+    <div class="portal-input-container">
+        <div style="width: 100%; max-width: var(--max-width); margin: 0 auto; display: flex; gap: 0.75rem; padding: 0 1rem;">
+            <textarea class="portal-textarea" id="portalInput" placeholder="Describe your structural asymmetry or rotational twist..."></textarea>
+            <button class="portal-submit" id="portalSubmit" type="button">Engage</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        const openBtn = document.getElementById('openPortalBtn');
+        const portal = document.getElementById('immersivePortal');
+        const closeBtn = document.getElementById('closePortalBtn');
+        const submitBtn = document.getElementById('portalSubmit');
+        const inputField = document.getElementById('portalInput');
+        const feedContainer = document.getElementById('portalFeed');
+
+        let userUuid = localStorage.getItem('sovereign_user_uuid') || 'user_' + Math.random().toString(36).substring(2, 11);
+        localStorage.setItem('sovereign_user_uuid', userUuid);
+
+        function togglePortal(e) {
+            if (e) e.preventDefault();
+            portal.classList.toggle('active');
+            if (portal.classList.contains('active')) {
+                inputField.focus();
+            }
+        }
+
+        if (openBtn) openBtn.addEventListener('click', togglePortal);
+        if (closeBtn) closeBtn.addEventListener('click', () => portal.classList.remove('active'));
+
+        async function handlePortalMessage() {
+            const text = inputField.value.trim();
+            if (!text) return;
+
+            const userDiv = document.createElement('div');
+            userDiv.className = 'portal-message user';
+            userDiv.textContent = text;
+            feedContainer.appendChild(userDiv);
+            inputField.value = '';
+            portal.scrollTo({ top: portal.scrollHeight, behavior: 'smooth' });
+
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'portal-message system';
+            loadingDiv.innerHTML = '<strong>The Architect:</strong> Analyzing skeletal geometry across network matrix...';
+            feedContainer.appendChild(loadingDiv);
+            portal.scrollTo({ top: portal.scrollHeight, behavior: 'smooth' });
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: text,
+                        uuid: userUuid
+                    })
+                });
+
+                const data = await response.json();
+                loadingDiv.remove();
+
+                const systemDiv = document.createElement('div');
+                systemDiv.className = 'portal-message system';
+                systemDiv.innerHTML = `<strong>The Architect:</strong> ${data.message || 'Error processing request.'}`;
+                feedContainer.appendChild(systemDiv);
+                portal.scrollTo({ top: portal.scrollHeight, behavior: 'smooth' });
+            } catch (err) {
+                loadingDiv.remove();
+                const errDiv = document.createElement('div');
+                errDiv.className = 'portal-message system';
+                errDiv.innerHTML = '<strong>The Architect:</strong> Connection error across network matrix. Verify worker bindings.';
+                feedContainer.appendChild(errDiv);
+                portal.scrollTo({ top: portal.scrollHeight, behavior: 'smooth' });
+            }
+        }
+
+        if (submitBtn) submitBtn.addEventListener('click', handlePortalMessage);
+        if (inputField) {
+            inputField.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handlePortalMessage();
+                }
+            });
+        }
+    })();
+</script>
+
+</body>
+</html>
